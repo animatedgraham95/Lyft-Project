@@ -36,14 +36,34 @@ test('works across the international date line', () => {
   assertClose(haversineDistance(0, 179, 0, -179), 222.39, 0.01);
 });
 
-test('Ride to completion', () => {
-  let client = states.REQUESTING;
-  client = nextRideState(client, 'driverMatched');
-  client = nextRideState(client, 'tripStarted');
-  client = nextRideState(client, 'tripCompleted');
-  assert.equal(client, states.COMPLETED);
+const validTransitions = [
+  [states.REQUESTING, 'driverMatched', states.MATCHED],
+  [states.REQUESTING, 'noDriverFound', states.NO_DRIVER],
+  [states.REQUESTING, 'rideCancelled', states.CANCELLED],
+  [states.MATCHED, 'tripStarted', states.IN_PROGRESS],
+  [states.MATCHED, 'rideCancelled', states.CANCELLED],
+  [states.IN_PROGRESS, 'tripCompleted', states.COMPLETED],
+  [states.IN_PROGRESS, 'rideCancelled', states.CANCELLED],
+];
+
+const invalidTransitions = [
+  [states.REQUESTING, 'tripStarted'],
+  [states.REQUESTING, 'tripCompleted'],
+  [states.MATCHED, 'tripCompleted'],
+  [states.MATCHED, 'noDriverFound'],
+  [states.COMPLETED, 'rideCancelled'],
+  [states.NO_DRIVER, 'driverMatched'],
+  [states.CANCELLED, 'driverMatched'],
+];
+
+test('all valid transitions work', () => {
+  for (const [from, event, expected] of validTransitions) {
+    assert.equal(nextRideState(from, event), expected);
+  }
 });
 
-test('unkonwn evetn throws instead of creashing', () => {
-  assert.throws(() => nextRideState(states.REQUESTING, 'bogus'), /Invalid transition/)
+test('all invalid transitions throw', () => {
+  for (const [from, event] of invalidTransitions) {
+    assert.throws(() => nextRideState(from, event), /Invalid transition/);
+  }
 });
