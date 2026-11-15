@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { haversineDistance } from '../src/distanceFormula.js';
+import {states, nextRideState} from '../src/tripLogic.js';
 
 function assertClose(actual, expected, tolerance) {
   assert.ok(
@@ -33,4 +34,16 @@ test('one degree of latitude is about 111.19 km', () => {
 
 test('works across the international date line', () => {
   assertClose(haversineDistance(0, 179, 0, -179), 222.39, 0.01);
+});
+
+test('Ride to completion', () => {
+  let client = states.REQUESTING;
+  client = nextRideState(client, 'driverMatched');
+  client = nextRideState(client, 'tripStarted');
+  client = nextRideState(client, 'tripCompleted');
+  assert.equal(client, states.COMPLETED);
+});
+
+test('unkonwn evetn throws instead of creashing', () => {
+  assert.throws(() => nextRideState(states.REQUESTING, 'bogus'), /Invalid transition/)
 });
