@@ -1,19 +1,19 @@
-export function haversineDistance(latitude_1, longitude_1,latitude_2, longitude_2){
-    const earthRadiusKM = 6371;
-    const toRadians = (degrees) => degrees * (Math.PI / 180);
-    const distanceLatitude = toRadians(latitude_2-latitude_1);
-    const distanceLongitude = toRadians(longitude_2-longitude_1);
-    const radiansLatitude1 = toRadians(latitude_1);
-    const radiansLatitude2 = toRadians(latitude_2);
+export function haversineDistance(a, b) {
+  const earthRadiusKM = 6371;
+  const toRadians = (degrees) => degrees * (Math.PI / 180);
 
-    const a =
-        Math.sin(distanceLatitude / 2) ** 2 +
-        Math.cos(radiansLatitude1) *
-        Math.cos(radiansLatitude2) *
-        Math.sin(distanceLongitude / 2) ** 2;
+  const distanceLatitude = toRadians(b.latitude - a.latitude);
+  const distanceLongitude = toRadians(b.longitude - a.longitude);
+  const radiansLatitude1 = toRadians(a.latitude);
+  const radiansLatitude2 = toRadians(b.latitude);
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const x =
+    Math.sin(distanceLatitude / 2) ** 2 +
+    Math.cos(radiansLatitude1) *
+    Math.cos(radiansLatitude2) *
+    Math.sin(distanceLongitude / 2) ** 2;
 
-    return earthRadiusKM * c;
+  const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+
+  return earthRadiusKM * c;
 }
-

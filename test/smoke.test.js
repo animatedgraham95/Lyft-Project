@@ -15,25 +15,33 @@ test('setup works', () => {
 });
 
 test('identical points return 0', () => {
-  assert.equal(haversineDistance(37.7749, -122.4194, 37.7749, -122.4194), 0);
+  assert.equal(haversineDistance({latitude:37.7749, longitude:-122.4194}, {latitude:37.7749, longitude:-122.4194}), 0);
 });
 test('San Francisco to Los Angeles is about 559 km', () => {
-  const km = haversineDistance(37.7749, -122.4194, 34.0522, -118.2437);
+  const km = haversineDistance({latitude:37.7749, longitude:-122.4194}, {latitude:34.0522, longitude:-118.2437});
   assertClose(km, 559.1, 0.5);
 });
 
 test('is symmetric', () => {
-  const ab = haversineDistance(37.7749, -122.4194, 34.0522, -118.2437);
-  const ba = haversineDistance(34.0522, -118.2437, 37.7749, -122.4194);
-  assertClose(ab, ba, 1e-9);
+  const sf = { latitude: 37.7749, longitude: -122.4194 };
+  const la = { latitude: 34.0522, longitude: -118.2437 };
+  assertClose(haversineDistance(sf, la), haversineDistance(la, sf), 1e-9);
 });
 
 test('one degree of latitude is about 111.19 km', () => {
-  assertClose(haversineDistance(0, 0, 1, 0), 111.19, 0.01);
+  assertClose(
+    haversineDistance({ latitude: 0, longitude: 0 }, { latitude: 1, longitude: 0 }),
+    111.19,
+    0.01
+  );
 });
 
 test('works across the international date line', () => {
-  assertClose(haversineDistance(0, 179, 0, -179), 222.39, 0.01);
+  assertClose(
+    haversineDistance({ latitude: 0, longitude: 179 }, { latitude: 0, longitude: -179 }),
+    222.39,
+    0.01
+  );
 });
 
 const validTransitions = [
